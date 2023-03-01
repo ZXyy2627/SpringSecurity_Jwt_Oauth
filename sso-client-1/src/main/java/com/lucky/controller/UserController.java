@@ -2,9 +2,12 @@ package com.lucky.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 
 /**
@@ -30,8 +33,20 @@ public class UserController {
      * @Version 1.0
      */
     @GetMapping("/queryUser")
-    public String queryUser(Model model) {
-        model.addAttribute("list", Arrays.asList("张三", "李四", "王五"));
-        return "user";
+    public String queryUser(
+            Model model,
+            HttpSession session,
+            @RequestParam(value = "token" ,required = false) String token) {
+        if (token != null && !"".equals(token)) {
+            //token有值，说明认证了,把用户信息放到session中
+            session.setAttribute("userLogin","zhang");
+        }
+        Object userLogin = session.getAttribute("userLogin");
+        if (!ObjectUtils.isEmpty(userLogin)) {
+            //说明登录过了，就直接放过
+            model.addAttribute("list", Arrays.asList("张三", "李四", "王五"));
+            return "user";
+        }
+        return "redirect:http://sso-server.com:8080/loginPage?redirect=http://client1.com:8081/queryUser";
     }
 }
