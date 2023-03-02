@@ -1,14 +1,14 @@
 package com.lucky.controller;
 
-import com.lucky.utils.RedisUtil;
+import com.lucky.utils.RedisTemplateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
 import java.util.UUID;
 
 /**
@@ -21,6 +21,8 @@ import java.util.UUID;
 @Controller
 public class LoginController {
 
+    @Resource
+    private RedisTemplateUtil redisTemplateUtil;
 
     /**
      * 跳转到登录界面
@@ -46,10 +48,11 @@ public class LoginController {
             @RequestParam("userName") String userName,
             @RequestParam("password") String password,
             @RequestParam(value = "url", required = false) String url) {
-        if ("zhang".equals(userName) && "123".equals(password)) {
+        if ("zhangS".equals(userName) && "123".equals(password)) {
             //如果登录成功，生成一个token
             String uuid = UUID.randomUUID().toString().replace("-", "");
             //把生成的信息放到redis中
+            redisTemplateUtil.set(uuid, "zhang");
 
             //登录成功
             return "redirect:" + url+"?token="+uuid;
